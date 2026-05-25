@@ -1,45 +1,48 @@
 class Solution:
     def solveSudoku(self, board):
-        """
-        Do not return anything, modify board in-place instead.
-        """
+        
+        rows = [set() for _ in range(9)]
+        cols = [set() for _ in range(9)]
+        boxes = [set() for _ in range(9)]
 
-        def is_valid(row, col, num):
-            # Check row
+        # Fill sets with existing numbers
+        for i in range(9):
             for j in range(9):
-                if board[row][j] == num:
-                    return False
-
-            # Check column
-            for i in range(9):
-                if board[i][col] == num:
-                    return False
-
-            # Check 3x3 box
-            start_row = (row // 3) * 3
-            start_col = (col // 3) * 3
-
-            for i in range(start_row, start_row + 3):
-                for j in range(start_col, start_col + 3):
-                    if board[i][j] == num:
-                        return False
-
-            return True
+                if board[i][j] != '.':
+                    num = board[i][j]
+                    rows[i].add(num)
+                    cols[j].add(num)
+                    box_index = (i // 3) * 3 + (j // 3)
+                    boxes[box_index].add(num)
 
         def solve():
             for i in range(9):
                 for j in range(9):
+
                     if board[i][j] == '.':
-                        
+
+                        box_index = (i // 3) * 3 + (j // 3)
+
                         for num in '123456789':
-                            if is_valid(i, j, num):
+
+                            if (num not in rows[i] and
+                                num not in cols[j] and
+                                num not in boxes[box_index]):
+
+                                # Place number
                                 board[i][j] = num
+                                rows[i].add(num)
+                                cols[j].add(num)
+                                boxes[box_index].add(num)
 
                                 if solve():
                                     return True
 
                                 # Backtrack
                                 board[i][j] = '.'
+                                rows[i].remove(num)
+                                cols[j].remove(num)
+                                boxes[box_index].remove(num)
 
                         return False
 
